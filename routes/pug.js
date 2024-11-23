@@ -8,12 +8,6 @@ const notes = require("../data/notes");
 const error = require("../utilities/error");
 
 
-
-
-
-
-
-
 // Home pug route
 router.get('/', (req, res) => {
   res.render('index', { title: 'Home', message: 'WELCOME' });
@@ -22,8 +16,6 @@ router.get('/', (req, res) => {
 
 
 // Home pug route
-
-
 router.get("/", (req, res) => {
   const imgUrl = '/public/img/ToDo.jpg'; 
   res.render('index', {imgUrl}); 

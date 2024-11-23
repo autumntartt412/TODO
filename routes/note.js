@@ -14,117 +14,72 @@ const error = require("../utilities/error");
 
 router
 .route("/")
-.get((req, res) =>{
-    if (req.query.userId) {
-        const userId = Number(req.query.userId); 
-        if (isNaN(userId)) return next(error(400, "Invalid userId format"))
-        const userNotes = notes.filter((n) => n.userId == userId); 
-        return res.json({userId: userId, n: userNotes})
-    }
-    // if (req.query.todoId){
-    //     const todoId = Number(req.query.todoId); 
-    //     if (isNaN(todoId)) return next(error(400, "Invalid todoId format"))
-
-    //     const userNotes = notes.filter((n) => n.todoId == todoId); 
-    //     return res.json({todoId: todoId, notes: userNotes})
-    // }
-    const links = [
-        {
-            href: "notes/:id",
-            rel: ":id",
-            type: "GET",
-        }
-    ];
-    res.json({notes, links})
-})
-
-// remove todoId
-
-
-
-.post((req, res, next) =>{
-    if (req.body.userId && req.body.todoId && req.body.content){
-        const note = {
-            id: notes[notes.length - 1].id + 1,
-            userId: req.body.userId,
-            content: req.body.content
-        }
-        notes.push(note);
-        res.json(notes[notes.length - 1]);
-    } else next(error(400, "Incorrect Data"));
-});
-
-
-
-
-// http://localhost:3000/api/notes/?usid=1
-
-router
-.route("/:id")
 .get((req, res, next) =>{
-  if (req.params.userId) {
-      const userId = Number(req.params.userId); 
-
-    const notes = n.find((n) => n.id == req.params.id);
-    return res.json({userId: userId, notes: userNotes})
-  }
-    const links = [
-        {
-            href: `/${req.params.id}`,
-            rel: "",
-            type: "PATCH",
-        },
-        {
-            href: `${req.params.id}`,
-            rel: "",
-            type: "DELETE",
-        },
-    ];
-    if (note) res.json({note, links});
-    else next();
+    res.json(todos)
+  res.render("note", {
+    todos
+  }); 
+  next();
 })
-.patch((req, res, next) => {
-    const note = notes.find((n, i) => {
-        if (n.id == req.params.id) {
-            for (const key in req.body){
-                notes[i][key] = req.body[key];
-            }
-            return true;
-        }
-    });
-    if (note) res.json(note);
-    else next();
-})
-.delete((req, res, next) =>{
-    const note = notes.find((n, i) => {
-        if (n.id == req.params.id) {
-            notes.splice(i, 1);
-            return true;
-        }
-    });
-    if (note) res.json(note); 
-    else next();
-});
+.post((req, res, next) => {
+    console.log(req.body)
+     if (req.body.userId && req.body.content) {
+       const note = {
+         id: notes[notes.length - 1].id + 1,
+         userId: req.body.userId,
+         content: req.body.content
+       };
+       console.log("note created from the body", note)
+       console.log(notes)
+       todos.push(note)
+       console.log('Added new note');
+       console.log(notes);
+       res.json(notes[notes.length - 1]) + 1;
+     } else next(error(400, "Incorrect Data"))
+     next();
+   });
 
 
-
-
-// http://localhost:3000/api/users/1/notes
+// http://localhost:3000/api/notes/?userId=1
 
 router
-.route("/users/:id/notes")
+.route("/:userId") 
 .get((req, res, next) => {
-if (req.query.userId) {
-  const userId = Number(req.query.userId);
-  const userNotes = comments.filter((n) => n.userId == userId); 
-  res.json({userId: userId, notes: userNotes}); 
-
-  if (isNaN(userId)) return next(error(400, "Invalid user ID"))
-} 
-const id = Number(req.params.id);
-const userNotes = notes.filter((n) => n.id == id); 
-res.json({id: id, notes: userNotes});
-});
+ console.log(req.params)
+   if (req.params.userId) {
+    const userId = req.params.userId;
+     res.json(notes.filter(n => n.userId == Number(userId))),
+     next()
+   }
+  })
+.put((req, res, next) => {
+const userId  = req.params.userId;
+const updateNote = req.body; 
+const noteIndex = notes.findIndex(t => n.userId == userId && n.content == updateNote);
+  if (noteIndex !== -1) {
+    const note = notes[noteIndex]
+  if (updateNote.content) {
+    note.content = updateNote.content;
+  }   
+res.json(note);  
+    } else {
+      const error = new Error('note not found');
+      error.status = 404;
+      next(error);  
+    }
+  })
+.delete((req, res, next) => {
+    const noteIndex = notes.findIndex(n => n.id == req.params.userId);
+    console.log(req.params.userId)
+    if (noteIndex !== -1) {
+      const deletedNote = notes.splice(noteIndex, 1);
+      res.json(deletedNote[0]);  
+    } else {
+      const error = new Error('note not found');
+      error.status = 404;
+      next(error);  
+    }
+  });
 
 
 
